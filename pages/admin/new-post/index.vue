@@ -6,12 +6,14 @@
 import newPostForm from "@/components/Admin/NewPostForm.vue";
 export default {
   components: { newPostForm },
-  layout: 'admin',
+  layout: "admin",
   methods: {
-     onSubmit(post) {
-        console.log('Post Added!')
-        console.log(post)
-     }
+    onSubmit(post) {
+      this.$store.dispatch("addPost", post)
+      .then(() => {
+        this.$router.push("/admin");
+      });
+    }
   }
 };
 </script>

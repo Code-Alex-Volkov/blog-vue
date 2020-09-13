@@ -1,6 +1,7 @@
 {
   "name": "blog",
   "version": "1.0.0",
+  "author": "Alex",
   "private": true,
   "scripts": {
     "dev": "nuxt",
@@ -9,6 +10,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "nuxt": "^2.14.0"
   },
   "devDependencies": {

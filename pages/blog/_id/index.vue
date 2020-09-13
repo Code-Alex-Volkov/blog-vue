@@ -2,38 +2,41 @@
   <div class="wrapper-content wrapper-content--fixed">
     <post :post="post" />
     <comments :comments="comments" />
-    <newComment />
+    <newComment :postId="$route.params.id" />
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import post from "@/components/Blog/Post.vue";
 import newComment from "@/components/Comments/NewComment.vue";
 import comments from "@/components/Comments/Comments.vue";
 export default {
   components: { post, comments, newComment },
-  data() {
+  async asyncData(context) {
+    let [post, comments] = await Promise.all([
+      axios.get(
+        `https://blog-nuxt-4e634.firebaseio.com/posts/${context.params.id}.json`
+      ),
+      axios.get(`https://blog-nuxt-4e634.firebaseio.com/comments.json`)
+    ]);
+    /* let commentsArray = [],
+        commentsArrayRes = []
+        Object.keys(comments.data).forEach(key => {
+          commentsArray.push(comments.data[key])
+        })
+
+        for (let i=0; i < commentsArray.length; i++) {
+          if (commentsArray[i].postId === context.params.id && commentsArray[i].publish === true) {
+            commentsArrayRes.push(commentsArray[i])
+          }
+        } */
+    let commentsArrayRes = Object.values(comments.data).filter(
+      comment => comment.postId === context.params.id && comment.publish
+    );
     return {
-      post: {
-        id: 1,
-        title: "1 post",
-        descr:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-        img:
-          "https://icdn.lenta.ru/images/2020/03/25/17/20200325175249731/pwa_vertical_1024_f31bf99d62a6b93477b3322d22907449.jpg"
-      },
-      comments: [
-        {
-          name: "Alex",
-          text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        },
-        {
-          name: "Aaron",
-          text: "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        }
-      ]
+      post: post.data,
+      comments: commentsArrayRes
     };
   }
 };
